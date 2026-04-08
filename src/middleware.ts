@@ -1,5 +1,5 @@
-import { auth } from "../auth";
 import { NextResponse } from "next/server";
+import { auth } from "../auth";
 
 export default auth((req) => {
   const { nextUrl, auth: session } = req;
@@ -11,7 +11,6 @@ export default auth((req) => {
     (route) => nextUrl.pathname === route,
   );
 
-  console.log(`Middleware: ${nextUrl.pathname}, Logged In: ${isLoggedIn}`);
   // Allow access to public routes
   if (isPublicRoute) {
     return NextResponse.next();
@@ -19,8 +18,12 @@ export default auth((req) => {
 
   // For all other routes, require authentication
   if (!isLoggedIn) {
-    // Redirect unauthenticated users to home page
-    return NextResponse.redirect(new URL("/", nextUrl));
+    const signInUrl = new URL("/auth/signin", nextUrl);
+    signInUrl.searchParams.set(
+      "callbackUrl",
+      `${nextUrl.pathname}${nextUrl.search}`,
+    );
+    return NextResponse.redirect(signInUrl);
   }
 
   // Allow authenticated users to access all routes
