@@ -1,9 +1,11 @@
 import Link from "next/link";
 import AuthButton from "@/components/auth-button";
+import Comments from "@/components/comments";
 import { auth } from "../../../auth";
 
 export default async function Dashboard() {
   const session = await auth();
+  const commentsAppId = process.env.NEXT_PUBLIC_CUSDIS_APP_ID || "";
 
   return (
     <div className="min-h-screen p-8 max-w-4xl mx-auto">
@@ -56,6 +58,19 @@ export default async function Dashboard() {
             <li>Stores session data with JWT-based Auth.js sessions</li>
             <li>Shows the authenticated user data returned by the provider</li>
           </ul>
+        </div>
+
+        <div className="bg-foreground/5 rounded-lg p-6 mt-6">
+          <h2 className="text-xl font-semibold mb-3">Comments</h2>
+          <p className="mb-4 text-foreground/70">
+            This discussion area is only reachable after authentication because
+            it lives inside the protected dashboard.
+          </p>
+          <Comments
+            appId={commentsAppId}
+            pageId="/dashboard"
+            pageTitle="Dashboard Discussion"
+          />
         </div>
       </main>
     </div>

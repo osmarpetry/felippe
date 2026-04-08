@@ -19,6 +19,7 @@ export default function Comments({
 }: CusdisProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [mounted, setMounted] = useState(false);
+  const hasAppId = appId.trim().length > 0;
 
   // Set mounted state after hydration to avoid mismatch
   useEffect(() => {
@@ -26,16 +27,26 @@ export default function Comments({
   }, []);
 
   useEffect(() => {
-    if (!mounted) return;
+    if (!mounted || !hasAppId) return;
 
-    // Load Cusdis script
+    const existingScript = document.querySelector<HTMLScriptElement>(
+      'script[data-cusdis="true"]',
+    );
+
+    if (existingScript) {
+      if (window.CUSDIS) {
+        window.CUSDIS.initial();
+      }
+      return;
+    }
+
     const script = document.createElement("script");
     script.src = "https://cusdis.com/js/cusdis.es.js";
     script.async = true;
     script.defer = true;
+    script.dataset.cusdis = "true";
     document.body.appendChild(script);
 
-    // Initialize Cusdis when script loads
     script.onload = () => {
       if (window.CUSDIS) {
         window.CUSDIS.initial();
@@ -43,23 +54,29 @@ export default function Comments({
     };
 
     return () => {
-      // Cleanup script on unmount
-      if (document.body.contains(script)) {
-        document.body.removeChild(script);
-      }
+      script.onload = null;
     };
-  }, [mounted]);
+  }, [hasAppId, mounted]);
 
   // Update Cusdis when theme changes
   useEffect(() => {
-    if (window.CUSDIS) {
+    if (hasAppId && window.CUSDIS) {
       window.CUSDIS.setTheme(theme);
     }
-  }, [theme]);
+  }, [hasAppId, theme]);
 
   // Don't render the widget until after hydration to avoid mismatch
   if (!mounted) {
     return <div className="w-full" style={{ minHeight: "324px" }} />;
+  }
+
+  if (!hasAppId) {
+    return (
+      <div className="rounded-2xl border border-dashed border-foreground/15 bg-background/70 p-5 text-sm leading-6 text-foreground/70">
+        Comments are not configured for this deployment yet. Add
+        `NEXT_PUBLIC_CUSDIS_APP_ID` and redeploy to enable Cusdis.
+      </div>
+    );
   }
 
   return (
