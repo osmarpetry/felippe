@@ -43,7 +43,7 @@ export default async function SignIn({
           <h1 className="text-3xl font-bold mb-2">Account access</h1>
           <p className="text-foreground/70 leading-6">
             {hasAvailableProviders
-              ? "Continue with one of the configured identity providers. You will be redirected to GitHub or Google to authorize access. This site does not collect provider passwords directly."
+              ? "Continue with one of the configured identity providers. You will be redirected to authorize access. This site does not collect provider passwords directly."
               : "Authentication is not configured on this deployment yet. Add at least one OAuth provider to enable account access."}
           </p>
         </div>

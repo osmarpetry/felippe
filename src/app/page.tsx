@@ -1,4 +1,12 @@
+import type { Metadata } from "next";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
 export default function Home() {
   return (
@@ -14,34 +22,27 @@ export default function Home() {
                 Content Playlist
               </h1>
               <p className="mt-4 max-w-2xl text-base leading-7 text-foreground/70 md:text-lg">
-                A private Auth.js demo deployed on Netlify. The current app is
-                focused on provider sign-in, route protection, and session
-                handling. Playlist management is not implemented yet.
+                A private Auth.js demo deployed on Netlify. The current app
+                focuses on route protection and session handling. Playlist
+                management is not implemented yet.
               </p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <Link
-                  href="/auth/signin"
+                  href="/dashboard"
                   className="inline-flex items-center justify-center rounded-full bg-foreground px-6 py-3 text-sm font-medium text-background transition-colors hover:bg-foreground/90"
                 >
-                  Account access
-                </Link>
-                <Link
-                  href="/dashboard"
-                  className="inline-flex items-center justify-center rounded-full border border-foreground/15 px-6 py-3 text-sm font-medium transition-colors hover:bg-foreground/5"
-                >
-                  Open dashboard
+                  Open app
                 </Link>
               </div>
             </div>
 
             <div className="rounded-2xl border border-foreground/10 bg-background p-6 shadow-sm">
               <h2 className="text-sm font-semibold uppercase tracking-[0.18em] text-foreground/50">
-                Authentication
+                Access
               </h2>
               <p className="mt-4 text-sm leading-6 text-foreground/70">
-                This site never asks for GitHub or Google passwords directly.
-                When you choose to continue, you are redirected to the provider
-                to authorize access.
+                Authentication uses a redirect-based OAuth flow. This site never
+                asks for your provider password directly.
               </p>
             </div>
           </div>
@@ -51,8 +52,8 @@ export default function Home() {
           <article className="rounded-2xl border border-foreground/10 p-6">
             <h2 className="text-lg font-semibold">Dedicated sign-in route</h2>
             <p className="mt-3 text-sm leading-6 text-foreground/70">
-              OAuth provider buttons are isolated to the account access page
-              instead of being rendered on the public homepage.
+              Sign-in lives behind the app flow instead of being rendered on the
+              public homepage.
             </p>
           </article>
           <article className="rounded-2xl border border-foreground/10 p-6">
