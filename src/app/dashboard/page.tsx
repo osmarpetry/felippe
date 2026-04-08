@@ -66,11 +66,14 @@ export default async function Dashboard() {
             This discussion area is only reachable after authentication because
             it lives inside the protected dashboard.
           </p>
-          <Comments
-            appId={commentsAppId}
-            pageId="/dashboard"
-            pageTitle="Dashboard Discussion"
-          />
+          <div className="rounded-2xl border border-foreground/10 bg-white p-4 shadow-sm">
+            <Comments
+              appId={commentsAppId}
+              pageId="/dashboard"
+              pageTitle="Dashboard Discussion"
+              theme="light"
+            />
+          </div>
         </div>
       </main>
     </div>

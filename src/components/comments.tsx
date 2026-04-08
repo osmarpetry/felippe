@@ -2,6 +2,20 @@
 
 import { useEffect, useRef, useState } from "react";
 
+const MIN_CUSDIS_HEIGHT = 680;
+
+function styleCusdisIframe(
+  iframe: HTMLIFrameElement,
+  minHeight = MIN_CUSDIS_HEIGHT,
+) {
+  iframe.style.display = "block";
+  iframe.style.width = "100%";
+  iframe.style.minHeight = `${minHeight}px`;
+  iframe.style.height = `${minHeight}px`;
+  iframe.style.overflow = "hidden";
+  iframe.setAttribute("scrolling", "no");
+}
+
 interface CusdisProps {
   appId: string;
   pageId?: string;
@@ -58,6 +72,63 @@ export default function Comments({
     };
   }, [hasAppId, mounted]);
 
+  useEffect(() => {
+    if (!mounted || !hasAppId) return;
+
+    const syncTimer = window.setInterval(() => {
+      const iframe = containerRef.current?.querySelector("iframe");
+
+      if (!iframe) {
+        return;
+      }
+
+      styleCusdisIframe(iframe);
+      window.clearInterval(syncTimer);
+    }, 250);
+
+    return () => {
+      window.clearInterval(syncTimer);
+    };
+  }, [hasAppId, mounted]);
+
+  useEffect(() => {
+    if (!mounted || !hasAppId) return;
+
+    const handleMessage = (event: MessageEvent) => {
+      if (typeof event.data !== "string") {
+        return;
+      }
+
+      try {
+        const payload = JSON.parse(event.data);
+
+        if (payload.from !== "cusdis" || payload.event !== "resize") {
+          return;
+        }
+
+        const nextHeight =
+          typeof payload.data === "number"
+            ? Math.max(payload.data, MIN_CUSDIS_HEIGHT)
+            : MIN_CUSDIS_HEIGHT;
+
+        const iframe = containerRef.current?.querySelector("iframe");
+        if (!iframe) {
+          return;
+        }
+
+        styleCusdisIframe(iframe, nextHeight);
+      } catch {
+        // Ignore unrelated postMessage events from other scripts.
+      }
+    };
+
+    window.addEventListener("message", handleMessage);
+
+    return () => {
+      window.removeEventListener("message", handleMessage);
+    };
+  }, [hasAppId, mounted]);
+
   // Update Cusdis when theme changes
   useEffect(() => {
     if (hasAppId && window.CUSDIS) {
@@ -82,8 +153,8 @@ export default function Comments({
   return (
     <div
       ref={containerRef}
-      className="w-full h-full"
-      style={{ minHeight: "324px" }}
+      className="w-full overflow-hidden rounded-2xl bg-white"
+      style={{ minHeight: `${MIN_CUSDIS_HEIGHT}px` }}
       id="cusdis_thread"
       data-host="https://cusdis.com"
       data-app-id={appId}
